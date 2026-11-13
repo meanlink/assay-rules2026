@@ -18,6 +18,7 @@ def deliver(db, report):
     cols=table.get('columns',[])
     writer=csv.writer(out)
     def safe(v):
+        if v is None or v == '': return ''
         if isinstance(v,(int,float)) and not isinstance(v,bool): return v
         text=str(v)
         return "'"+text if text.startswith(('=','+','-','@','\t','\r')) else text

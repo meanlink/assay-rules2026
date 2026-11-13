@@ -7,9 +7,9 @@ export function chart(c){
  const y=v=>top+ph-(Number(v)-low)/span*ph,x=i=>left+(i+.5)*pw/n;
  let svg='';for(let i=0;i<=4;i++){let v=low+span*i/4;svg+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(left+pw)+'" y2="'+y(v)+'" class="grid"/><text x="'+(left-10)+'" y="'+(y(v)+4)+'" text-anchor="end">'+esc(v.toFixed(Math.abs(v)>100?0:2))+'</text>';}
  series.forEach((s,j)=>{
-   if(c.type==='bar')s.values.forEach((v,i)=>{let w=pw/n/(series.length+1);svg+='<rect class="series s'+j+'" x="'+(x(i)-pw/n*.4+j*w)+'" y="'+Math.min(y(v),y(0))+'" width="'+Math.max(1,w-2)+'" height="'+Math.max(1,Math.abs(y(v)-y(0)))+'"><title>'+esc(labels[i])+' · '+esc(s.name)+': '+esc(v)+'</title></rect>';});
-   else if(c.type==='scatter')s.values.forEach((v,i)=>{svg+='<circle class="series s'+j+'" cx="'+x(i)+'" cy="'+y(v)+'" r="3"><title>'+esc(labels[i])+': '+esc(v)+'</title></circle>';});
-   else svg+='<polyline class="line s'+j+'" points="'+s.values.map((v,i)=>x(i)+','+y(v)).join(' ')+'"/>';
+   if(c.type==='bar')s.values.forEach((v,i)=>{if(v===null||v===undefined||!Number.isFinite(Number(v)))return;let w=pw/n/(series.length+1);svg+='<rect class="series s'+j+'" x="'+(x(i)-pw/n*.4+j*w)+'" y="'+Math.min(y(v),y(0))+'" width="'+Math.max(1,w-2)+'" height="'+Math.max(1,Math.abs(y(v)-y(0)))+'"><title>'+esc(labels[i])+' · '+esc(s.name)+': '+esc(v)+'</title></rect>';});
+   else if(c.type==='scatter')s.values.forEach((v,i)=>{if(v===null||v===undefined||!Number.isFinite(Number(v)))return;svg+='<circle class="series s'+j+'" cx="'+x(i)+'" cy="'+y(v)+'" r="3"><title>'+esc(labels[i])+': '+esc(v)+'</title></circle>';});
+   else svg+='<polyline class="line s'+j+'" points="'+s.values.map((v,i)=>(v===null||v===undefined||!Number.isFinite(Number(v)))?null:x(i)+','+y(v)).filter(Boolean).join(' ')+'"/>';
  });
  labels.forEach((label,i)=>{if(i%Math.max(1,Math.ceil(n/10))===0)svg+='<text x="'+x(i)+'" y="'+(top+ph+25)+'" text-anchor="middle">'+esc(String(label).slice(0,12))+'</text>';});
  return '<div class="legend">'+series.map((s,i)=>'<span class="key k'+i+'">'+esc(s.name)+'</span>').join('')+'</div><svg class="chart" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="后端分析结果图">'+svg+'</svg>';
